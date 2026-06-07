@@ -1,37 +1,108 @@
 from memoria import Memoria
 
-memoria = Memoria(1000)
 
-print("\nFIRST FIT")
+procesos = [
+    ("A", 200),
+    ("B", 300),
+    ("C", 100),
+    ("D", 150),
+    ("E", 180)
+]
 
-memoria.first_fit("A", 200)
-memoria.first_fit("B", 300)
-memoria.first_fit("C", 100)
+# =====================
+# FIRST FIT
+# =====================
 
-memoria.mostrar_memoria()
+first = Memoria(1000)
 
-print("\nLiberando B")
+for proceso, tamaño in procesos:
+    first.first_fit(proceso, tamaño)
 
-memoria.liberar("B")
+# =====================
+# BEST FIT
+# =====================
 
-memoria.mostrar_memoria()
+best = Memoria(1000)
 
-print("\nAsignando D (150 MB)")
+for proceso, tamaño in procesos:
+    best.best_fit(proceso, tamaño)
 
-memoria.first_fit("D", 150)
+# =====================
+# WORST FIT
+# =====================
 
-memoria.mostrar_memoria()
+worst = Memoria(1000)
 
-print("\nLiberando C")
+for proceso, tamaño in procesos:
+    worst.worst_fit(proceso, tamaño)
 
-memoria.liberar("C")
+# =====================
+# MOSTRAR ESTADOS
+# =====================
 
-memoria.mostrar_memoria()
+print("\n===== FIRST FIT =====")
+first.mostrar_memoria()
 
-print("\nCompactando memoria")
+print("\n===== BEST FIT =====")
+best.mostrar_memoria()
 
-memoria.compactar()
+print("\n===== WORST FIT =====")
+worst.mostrar_memoria()
 
-memoria.mostrar_memoria()
+# =====================
+# COMPARACIÓN
+# =====================
 
-memoria.mostrar_historial()
+print("\n===== COMPARACIÓN =====")
+
+print(
+    "First Fit:",
+    first.fragmentacion_externa(),
+    "MB de fragmentación externa"
+)
+
+print(
+    "Best Fit:",
+    best.fragmentacion_externa(),
+    "MB de fragmentación externa"
+)
+
+print(
+    "Worst Fit:",
+    worst.fragmentacion_externa(),
+    "MB de fragmentación externa"
+)
+
+# =====================
+# MEJOR ALGORITMO
+# =====================
+
+algoritmos = {
+    "First Fit": first.fragmentacion_externa(),
+    "Best Fit": best.fragmentacion_externa(),
+    "Worst Fit": worst.fragmentacion_externa()
+}
+
+menor_fragmentacion = min(algoritmos.values())
+
+mejores = [
+    nombre
+    for nombre, fragmentacion in algoritmos.items()
+    if fragmentacion == menor_fragmentacion
+]
+
+print("\nMejor algoritmo:", ", ".join(mejores))
+print("Fragmentación externa:", menor_fragmentacion, "MB")
+
+# =====================
+# HISTORIALES
+# =====================
+
+print("\n===== HISTORIAL FIRST FIT =====")
+first.mostrar_historial()
+
+print("\n===== HISTORIAL BEST FIT =====")
+best.mostrar_historial()
+
+print("\n===== HISTORIAL WORST FIT =====")
+worst.mostrar_historial()

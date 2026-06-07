@@ -257,3 +257,32 @@ class Memoria:
                 f"{operacion['proceso']} "
                 f"{operacion['tamaño']}"
             )
+
+    # =====================
+    # FRAGMENTACIÓN EXTERNA
+    # =====================
+
+    def fragmentacion_externa(self):
+
+        total_libre = 0
+        bloque_libre_mayor = 0
+
+        for bloque in self.bloques:
+
+            if bloque.libre:
+
+                total_libre += bloque.tamaño
+
+                if bloque.tamaño > bloque_libre_mayor:
+                    bloque_libre_mayor = bloque.tamaño
+
+        return total_libre - bloque_libre_mayor
+
+    # =====================
+    # FRAGMENTACIÓN INTERNA
+    # =====================
+
+    def fragmentacion_interna(self):
+
+        # En particiones variables exactas, normalmente es 0
+        return 0
