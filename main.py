@@ -1,4 +1,4 @@
-from memoria import Memoria
+from interfaz import Interfaz
 
 
 procesos = [

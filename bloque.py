@@ -7,5 +7,15 @@ class Bloque:
         self.proceso = proceso
 
     def __str__(self):
-        estado = "Libre" if self.libre else f"Ocupado por {self.proceso}"
-        return f"Inicio: {self.inicio} | Tamaño: {self.tamaño} MB | {estado}"
+
+        estado = (
+            "Libre"
+            if self.libre
+            else f"Ocupado por {self.proceso}"
+        )
+
+        return (
+            f"Inicio: {self.inicio} | "
+            f"Tamaño: {self.tamaño} MB | "
+            f"{estado}"
+        )

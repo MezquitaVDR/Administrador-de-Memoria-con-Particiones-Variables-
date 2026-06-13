@@ -7,9 +7,11 @@ class Memoria:
 
         self.tamaño_total = tamaño_total
 
-        # Inicialmente toda la memoria está libre
         self.bloques = [
-            Bloque(0, tamaño_total)
+            Bloque(
+                0,
+                tamaño_total
+            )
         ]
 
         self.historial = []
@@ -129,7 +131,7 @@ class Memoria:
         )
 
     # =====================
-    # LIBERAR PROCESO
+    # LIBERAR
     # =====================
 
     def liberar(self, proceso):
@@ -174,14 +176,16 @@ class Memoria:
 
                 actual.tamaño += siguiente.tamaño
 
-                self.bloques.pop(i + 1)
+                self.bloques.pop(
+                    i + 1
+                )
 
             else:
 
                 i += 1
 
     # =====================
-    # COMPACTACIÓN
+    # COMPACTAR
     # =====================
 
     def compactar(self):
@@ -228,44 +232,14 @@ class Memoria:
         )
 
     # =====================
-    # MOSTRAR MEMORIA
-    # =====================
-
-    def mostrar_memoria(self):
-
-        print("\n===== ESTADO DE MEMORIA =====")
-
-        for bloque in self.bloques:
-
-            print(bloque)
-
-    # =====================
-    # MOSTRAR HISTORIAL
-    # =====================
-
-    def mostrar_historial(self):
-
-        print("\n===== HISTORIAL =====")
-
-        for i, operacion in enumerate(
-                self.historial,
-                start=1):
-
-            print(
-                f"{i}. "
-                f"{operacion['operacion']} "
-                f"{operacion['proceso']} "
-                f"{operacion['tamaño']}"
-            )
-
-    # =====================
     # FRAGMENTACIÓN EXTERNA
     # =====================
 
     def fragmentacion_externa(self):
 
         total_libre = 0
-        bloque_libre_mayor = 0
+
+        bloque_mayor = 0
 
         for bloque in self.bloques:
 
@@ -273,10 +247,12 @@ class Memoria:
 
                 total_libre += bloque.tamaño
 
-                if bloque.tamaño > bloque_libre_mayor:
-                    bloque_libre_mayor = bloque.tamaño
+                bloque_mayor = max(
+                    bloque_mayor,
+                    bloque.tamaño
+                )
 
-        return total_libre - bloque_libre_mayor
+        return total_libre - bloque_mayor
 
     # =====================
     # FRAGMENTACIÓN INTERNA
@@ -284,5 +260,4 @@ class Memoria:
 
     def fragmentacion_interna(self):
 
-        # En particiones variables exactas, normalmente es 0
         return 0
