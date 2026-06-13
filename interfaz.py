@@ -8,16 +8,21 @@ class Interfaz:
 
     def __init__(self):
 
-        self.memoria = Memoria(1000)
+        # Tres memorias independientes
+        self.first = Memoria(1000)
+        self.best = Memoria(1000)
+        self.worst = Memoria(1000)
 
         self.ventana = tk.Tk()
         self.ventana.title(
             "Administrador de Memoria con Particiones Variables"
         )
 
-        self.ventana.geometry("1100x700")
+        self.ventana.geometry("1400x800")
 
-        # ===== PROCESO =====
+        # =====================
+        # PROCESO
+        # =====================
 
         tk.Label(
             self.ventana,
@@ -30,7 +35,9 @@ class Interfaz:
 
         self.entry_proceso.pack()
 
-        # ===== TAMAÑO =====
+        # =====================
+        # TAMAÑO
+        # =====================
 
         tk.Label(
             self.ventana,
@@ -43,37 +50,19 @@ class Interfaz:
 
         self.entry_tamaño.pack()
 
-        # ===== ALGORITMO =====
-
-        tk.Label(
-            self.ventana,
-            text="Algoritmo"
-        ).pack()
-
-        self.combo = ttk.Combobox(
-            self.ventana,
-            values=[
-                "First Fit",
-                "Best Fit",
-                "Worst Fit"
-            ]
-        )
-
-        self.combo.current(0)
-
-        self.combo.pack()
-
-        # ===== BOTONES =====
+        # =====================
+        # BOTONES
+        # =====================
 
         tk.Button(
             self.ventana,
-            text="Asignar",
+            text="Agregar proceso",
             command=self.asignar
         ).pack()
 
         tk.Button(
             self.ventana,
-            text="Liberar",
+            text="Liberar proceso",
             command=self.liberar
         ).pack()
 
@@ -83,14 +72,100 @@ class Interfaz:
             command=self.compactar
         ).pack()
 
-        # ===== TABLA MEMORIA =====
+        # =====================
+        # FIRST FIT
+        # =====================
 
         tk.Label(
             self.ventana,
-            text="Estado de Memoria"
+            text="FIRST FIT"
         ).pack()
 
-        self.tabla_memoria = ttk.Treeview(
+        self.tabla_first = self.crear_tabla()
+
+        # =====================
+        # BEST FIT
+        # =====================
+
+        tk.Label(
+            self.ventana,
+            text="BEST FIT"
+        ).pack()
+
+        self.tabla_best = self.crear_tabla()
+
+        # =====================
+        # WORST FIT
+        # =====================
+
+        tk.Label(
+            self.ventana,
+            text="WORST FIT"
+        ).pack()
+
+        self.tabla_worst = self.crear_tabla()
+
+        # =====================
+        # COMPARACIÓN
+        # =====================
+
+        tk.Label(
+            self.ventana,
+            text="Comparación"
+        ).pack()
+
+        self.tabla_comparacion = ttk.Treeview(
+            self.ventana,
+            columns=(
+                "Algoritmo",
+                "Fragmentación"
+            ),
+            show="headings",
+            height=3
+        )
+
+        self.tabla_comparacion.heading(
+            "Algoritmo",
+            text="Algoritmo"
+        )
+
+        self.tabla_comparacion.heading(
+            "Fragmentación",
+            text="Fragmentación externa"
+        )
+
+        self.tabla_comparacion.pack(
+            fill="x"
+        )
+
+        # =====================
+        # MEJOR ALGORITMO
+        # =====================
+
+        self.label_mejor = tk.Label(
+            self.ventana,
+            text="",
+            fg="blue",
+            font=(
+                "Arial",
+                12,
+                "bold"
+            )
+        )
+
+        self.label_mejor.pack(
+            pady=10
+        )
+
+        self.actualizar_tablas()
+
+        self.ventana.mainloop()
+
+    # =====================================
+
+    def crear_tabla(self):
+
+        tabla = ttk.Treeview(
             self.ventana,
             columns=(
                 "Inicio",
@@ -98,146 +173,103 @@ class Interfaz:
                 "Estado"
             ),
             show="headings",
-            height=10
+            height=5
         )
 
-        self.tabla_memoria.heading(
+        tabla.heading(
             "Inicio",
             text="Inicio"
         )
 
-        self.tabla_memoria.heading(
+        tabla.heading(
             "Tamaño",
             text="Tamaño"
         )
 
-        self.tabla_memoria.heading(
+        tabla.heading(
             "Estado",
             text="Estado"
         )
 
-        self.tabla_memoria.pack(
+        tabla.pack(
             fill="x"
         )
 
-        # ===== TABLA HISTORIAL =====
+        return tabla
 
-        tk.Label(
-            self.ventana,
-            text="Historial"
-        ).pack()
-
-        self.tabla_historial = ttk.Treeview(
-            self.ventana,
-            columns=(
-                "Operación",
-                "Proceso",
-                "Tamaño"
-            ),
-            show="headings",
-            height=10
-        )
-
-        self.tabla_historial.heading(
-            "Operación",
-            text="Operación"
-        )
-
-        self.tabla_historial.heading(
-            "Proceso",
-            text="Proceso"
-        )
-
-        self.tabla_historial.heading(
-            "Tamaño",
-            text="Tamaño"
-        )
-
-        self.tabla_historial.pack(
-            fill="x"
-        )
-
-        self.label_fragmentacion = tk.Label(
-            self.ventana,
-            text=""
-        )
-
-        self.label_fragmentacion.pack()
-
-        self.actualizar_tablas()
-
-        self.ventana.mainloop()
+    # =====================================
 
     def asignar(self):
 
         proceso = self.entry_proceso.get()
+
         tamaño = int(
             self.entry_tamaño.get()
         )
 
-        algoritmo = self.combo.get()
+        self.first.first_fit(
+            proceso,
+            tamaño
+        )
 
-        if algoritmo == "First Fit":
+        self.best.best_fit(
+            proceso,
+            tamaño
+        )
 
-            exito = self.memoria.first_fit(
-                proceso,
-                tamaño
-            )
-
-        elif algoritmo == "Best Fit":
-
-            exito = self.memoria.best_fit(
-                proceso,
-                tamaño
-            )
-
-        else:
-
-            exito = self.memoria.worst_fit(
-                proceso,
-                tamaño
-            )
-
-        if not exito:
-
-            messagebox.showerror(
-                "Error",
-                "No hay espacio suficiente"
-            )
+        self.worst.worst_fit(
+            proceso,
+            tamaño
+        )
 
         self.actualizar_tablas()
+
+    # =====================================
 
     def liberar(self):
 
         proceso = self.entry_proceso.get()
 
-        self.memoria.liberar(
+        self.first.liberar(
+            proceso
+        )
+
+        self.best.liberar(
+            proceso
+        )
+
+        self.worst.liberar(
             proceso
         )
 
         self.actualizar_tablas()
 
+    # =====================================
+
     def compactar(self):
 
-        self.memoria.compactar()
+        self.first.compactar()
+
+        self.best.compactar()
+
+        self.worst.compactar()
 
         self.actualizar_tablas()
 
-    def actualizar_tablas(self):
+    # =====================================
 
-        for fila in self.tabla_memoria.get_children():
-            self.tabla_memoria.delete(
+    def llenar_tabla(
+            self,
+            tabla,
+            memoria):
+
+        for fila in tabla.get_children():
+
+            tabla.delete(
                 fila
             )
 
-        for fila in self.tabla_historial.get_children():
-            self.tabla_historial.delete(
-                fila
-            )
-
-        # MEMORIA
-
-        for bloque in self.memoria.bloques:
+        for bloque in memoria.bloques:
 
             estado = (
                 "Libre"
@@ -245,7 +277,7 @@ class Interfaz:
                 else bloque.proceso
             )
 
-            self.tabla_memoria.insert(
+            tabla.insert(
                 "",
                 tk.END,
                 values=(
@@ -255,24 +287,82 @@ class Interfaz:
                 )
             )
 
-        # HISTORIAL
+    # =====================================
 
-        for operacion in self.memoria.historial:
+    def actualizar_tablas(self):
 
-            self.tabla_historial.insert(
-                "",
-                tk.END,
-                values=(
-                    operacion["operacion"],
-                    operacion["proceso"],
-                    operacion["tamaño"]
-                )
+        self.llenar_tabla(
+            self.tabla_first,
+            self.first
+        )
+
+        self.llenar_tabla(
+            self.tabla_best,
+            self.best
+        )
+
+        self.llenar_tabla(
+            self.tabla_worst,
+            self.worst
+        )
+
+        # =====================
+        # COMPARACIÓN
+        # =====================
+
+        for fila in self.tabla_comparacion.get_children():
+
+            self.tabla_comparacion.delete(
+                fila
             )
 
-        self.label_fragmentacion.config(
+        self.tabla_comparacion.insert(
+            "",
+            tk.END,
+            values=(
+                "First Fit",
+                self.first.fragmentacion_externa()
+            )
+        )
+
+        self.tabla_comparacion.insert(
+            "",
+            tk.END,
+            values=(
+                "Best Fit",
+                self.best.fragmentacion_externa()
+            )
+        )
+
+        self.tabla_comparacion.insert(
+            "",
+            tk.END,
+            values=(
+                "Worst Fit",
+                self.worst.fragmentacion_externa()
+            )
+        )
+
+        algoritmos = {
+
+            "First Fit":
+                self.first.fragmentacion_externa(),
+
+            "Best Fit":
+                self.best.fragmentacion_externa(),
+
+            "Worst Fit":
+                self.worst.fragmentacion_externa()
+        }
+
+        mejor = min(
+            algoritmos,
+            key=algoritmos.get
+        )
+
+        self.label_mejor.config(
             text=
-            f"Fragmentación externa: "
-            f"{self.memoria.fragmentacion_externa()} MB"
+            f"🏆 Mejor algoritmo: {mejor}"
         )
 
 
