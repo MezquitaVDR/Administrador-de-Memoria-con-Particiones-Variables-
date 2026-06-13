@@ -16,9 +16,7 @@ class Memoria:
 
         self.historial = []
 
-    # ======================
-    # FIRST FIT
-    # ======================
+    # =================================
 
     def first_fit(
             self,
@@ -27,10 +25,7 @@ class Memoria:
 
         for bloque in self.bloques:
 
-            if (
-                    bloque.libre and
-                    bloque.tamaño >= tamaño
-            ):
+            if bloque.libre and bloque.tamaño >= tamaño:
 
                 self._asignar_bloque(
                     bloque,
@@ -42,9 +37,7 @@ class Memoria:
 
         return False
 
-    # ======================
-    # BEST FIT
-    # ======================
+    # =================================
 
     def best_fit(
             self,
@@ -54,10 +47,7 @@ class Memoria:
         candidatos = [
             bloque
             for bloque in self.bloques
-            if (
-                    bloque.libre and
-                    bloque.tamaño >= tamaño
-            )
+            if bloque.libre and bloque.tamaño >= tamaño
         ]
 
         if not candidatos:
@@ -77,9 +67,7 @@ class Memoria:
 
         return True
 
-    # ======================
-    # WORST FIT
-    # ======================
+    # =================================
 
     def worst_fit(
             self,
@@ -89,10 +77,7 @@ class Memoria:
         candidatos = [
             bloque
             for bloque in self.bloques
-            if (
-                    bloque.libre and
-                    bloque.tamaño >= tamaño
-            )
+            if bloque.libre and bloque.tamaño >= tamaño
         ]
 
         if not candidatos:
@@ -112,9 +97,7 @@ class Memoria:
 
         return True
 
-    # ======================
-    # ASIGNAR BLOQUE
-    # ======================
+    # =================================
 
     def _asignar_bloque(
             self,
@@ -134,14 +117,12 @@ class Memoria:
 
         if sobrante > 0:
 
-            nuevo_bloque = Bloque(
-                bloque.inicio + tamaño,
-                sobrante
-            )
-
             self.bloques.insert(
                 indice + 1,
-                nuevo_bloque
+                Bloque(
+                    bloque.inicio + tamaño,
+                    sobrante
+                )
             )
 
         self.historial.append(
@@ -152,15 +133,17 @@ class Memoria:
             }
         )
 
-    # ======================
-    # LIBERAR
-    # ======================
+    # =================================
 
-    def liberar(self, proceso):
+    def liberar(
+            self,
+            proceso):
 
         for bloque in self.bloques:
 
             if bloque.proceso == proceso:
+
+                tamaño_liberado = bloque.tamaño
 
                 bloque.libre = True
                 bloque.proceso = None
@@ -171,31 +154,26 @@ class Memoria:
                     {
                         "operacion": "Liberar",
                         "proceso": proceso,
-                        "tamaño": bloque.tamaño
+                        "tamaño": tamaño_liberado
                     }
                 )
 
-                return
+                return True
 
-    # ======================
-    # FUSIONAR
-    # ======================
+        return False
+
+    # =================================
 
     def fusionar_bloques(self):
 
         i = 0
 
-        while i < len(
-                self.bloques
-        ) - 1:
+        while i < len(self.bloques) - 1:
 
             actual = self.bloques[i]
             siguiente = self.bloques[i + 1]
 
-            if (
-                    actual.libre and
-                    siguiente.libre
-            ):
+            if actual.libre and siguiente.libre:
 
                 actual.tamaño += siguiente.tamaño
 
@@ -207,9 +185,7 @@ class Memoria:
 
                 i += 1
 
-    # ======================
-    # COMPACTAR
-    # ======================
+    # =================================
 
     def compactar(self):
 
@@ -217,13 +193,13 @@ class Memoria:
 
         posicion = 0
 
-        espacio_libre = 0
+        libre = 0
 
         for bloque in self.bloques:
 
             if bloque.libre:
 
-                espacio_libre += bloque.tamaño
+                libre += bloque.tamaño
 
             else:
 
@@ -235,20 +211,26 @@ class Memoria:
 
                 posicion += bloque.tamaño
 
-        if espacio_libre > 0:
+        if libre > 0:
 
             nuevos.append(
                 Bloque(
                     posicion,
-                    espacio_libre
+                    libre
                 )
             )
 
         self.bloques = nuevos
 
-    # ======================
-    # FRAGMENTACION EXTERNA
-    # ======================
+        self.historial.append(
+            {
+                "operacion": "Compactar",
+                "proceso": "-",
+                "tamaño": "-"
+            }
+        )
+
+    # =================================
 
     def fragmentacion_externa(self):
 
